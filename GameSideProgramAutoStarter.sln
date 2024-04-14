@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameSideProgramAutoStarter", "GameSideProgramAutoStarter\GameSideProgramAutoStarter.csproj", "{C49A01B9-C4CB-4636-B5D4-B21E8099537B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C49A01B9-C4CB-4636-B5D4-B21E8099537B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C49A01B9-C4CB-4636-B5D4-B21E8099537B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C49A01B9-C4CB-4636-B5D4-B21E8099537B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C49A01B9-C4CB-4636-B5D4-B21E8099537B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83DB5AA3-0919-43FA-A0B1-2DCBC67C2949}
+	EndGlobalSection
+EndGlobal
