@@ -17,10 +17,14 @@ namespace GameSideProgramAutoStarter
 		private frmMessageBox? programExitFMB;
 		private frmAlarm alarm = frmAlarm.GetInstance();
 		private SettingForm? sf;
+		private csProcessLog pl = csProcessLog.GetInstance();
 
 		private formMain()
 		{
 			InitializeComponent();
+
+			// 프로세스 감시 시작
+			csProgramLinkMaster.GetInstance();
 
 			ContextMenuStrip strip = new ContextMenuStrip();
 
@@ -30,9 +34,11 @@ namespace GameSideProgramAutoStarter
 			{
 				if (sf != null) return;
 
+				pl.setAction = false;
 				sf = new SettingForm();
 				sf._SetObject(csProgramLinkMaster.GetInstance(), "링크");
 				sf.ShowDialog();
+				pl.setAction = true;
 
 				sf = null;
 			};
@@ -55,9 +61,6 @@ namespace GameSideProgramAutoStarter
 			strip.Items.Add(itemExit);
 
 			notifyIcon1.ContextMenuStrip = strip;
-
-			// 프로세스 감시 시작
-			csProgramLinkMaster.GetInstance();
 		}
 
 		private void formMain_Load(object sender, EventArgs e)
