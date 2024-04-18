@@ -18,84 +18,45 @@ namespace GameSideProgramAutoStarter.Cs
 		{
 			Load();
 
-			Thread thread = new Thread(CheckProcess)
-			{
-				IsBackground = true,
-			};
-			thread.Start();
+			pl.ProcessEvent += pl_Event;
+			pl.setAction = true;
 		}
 
 		private frmAlarm alarm = frmAlarm.GetInstance();
+		private csProcessLog pl = csProcessLog.GetInstance();
+
+		private void pl_Event(object? sender, csProcessLog.ProcessEventArgs e)
+		{
+			if (string.IsNullOrEmpty(e.ProcessName)) return;
+
+			if (e.isAlive)
+			{
+				foreach (csProgramLinkSub item in list.Where(item => item.GameProcessName == e.ProcessName))
+				{
+					if (string.IsNullOrEmpty(item.SideProgramPath)) return;
+
+					item.SideProcessName = Process.Start(item.SideProgramPath).ProcessName;
+
+					alarm.ShowMSG(e.ProcessName + "감지\r\n" + item.SideProcessName + "이(가)\r\n자동으로 실행됩니다.");
+				}
+			}
+			else
+			{
+				foreach (csProgramLinkSub item in list.Where(item => (item.GameProcessName == e.ProcessName && item.AutoClose)))
+				{
+					foreach (Process pSide in Process.GetProcessesByName(item.SideProcessName))
+					{
+						pSide.Kill();
+					}
+
+					alarm.ShowMSG(item.GameProcessName + " 종료 감지\r\n" + item.SideProcessName + "이(가)\r\n자동으로 종료됩니다.");
+				}
+			}
+		}
 
 		[DisplayName("자동실행 조건")]
 		[Description("자행실행 조건을 설정합니다.")]
 		public BindingList<csProgramLinkSub> list { get; set; } = new BindingList<csProgramLinkSub>();
-
-		public void SetProcess(Process process)
-		{
-			foreach (csProgramLinkSub sub in list)
-			{
-				if (process.ProcessName == sub.GameProcessName && sub.isRun == false && string.IsNullOrEmpty(sub.SideProgramPath) == false)
-				{
-					sub.isRun = true;
-					sub.SideProcessName = Process.Start(sub.SideProgramPath).ProcessName;
-
-					alarm.ShowMSG(process.ProcessName + "감지\r\n" + sub.SideProcessName + "이(가)\r\n자동으로 실행됩니다.");
-				}
-			}
-		}
-		public void SetProcess(string processName)
-		{
-			foreach (csProgramLinkSub sub in list)
-			{
-				if (processName == sub.GameProcessName && sub.isRun == false && string.IsNullOrEmpty(sub.SideProgramPath) == false)
-				{
-					sub.isRun = true;
-					sub.SideProcessName = Process.Start(sub.SideProgramPath).ProcessName;
-
-					alarm.ShowMSG(processName + "감지\r\n" + sub.SideProcessName + "이(가)\r\n자동으로 실행됩니다.");
-				}
-			}
-		}
-
-		private void CheckProcess()
-		{
-			try
-			{
-				while (true)
-				{
-					foreach (csProgramLinkSub sub in list)
-					{
-						if (sub.isRun)
-						{
-							Process[] p = Process.GetProcessesByName(sub.GameProcessName);
-							if (p == null || p.Length == 0)
-							{
-								sub.isRun = false;
-
-								if (sub.AutoClose && string.IsNullOrEmpty(sub.SideProgramPath) == false)
-								{
-									foreach (Process pSide in Process.GetProcessesByName(sub.SideProcessName))
-									{
-										pSide.Kill();
-									}
-
-									alarm.Invoke((MethodInvoker)delegate
-									{
-										alarm.ShowMSG(sub.GameProcessName + " 종료 감지\r\n" + sub.SideProcessName + "이(가)\r\n자동으로 종료됩니다.");
-									});
-								}
-							}
-						}
-					}
-					Thread.Sleep(1000);
-				}
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show(e.Message);
-			}
-		}
 	}
 	[Serializable]
 	public class csProgramLinkSub : csAutoSaveLoad
@@ -107,12 +68,10 @@ namespace GameSideProgramAutoStarter.Cs
 		[String(StringAttributeEnum.File)]
 		public string? SideProgramPath { get; set; }
 
-		public string SideProcessName = null;
+		public string? SideProcessName = null;
 
 		[DisplayName("자동 종료")]
 		[DefaultValue(false)]
 		public bool AutoClose { get; set; }
-
-		public bool isRun = false;
 	}
 }

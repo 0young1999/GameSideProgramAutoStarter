@@ -41,7 +41,10 @@ namespace GameSideProgramAutoStarter.Cs
 				{
 					while (setAction)
 					{
-						pds.Select(item => { return item.isAlive = false; });
+						foreach (ProcessData data in pds)
+						{
+							data.isAlive = false;
+						}
 
 						Process[] pss = Process.GetProcesses();
 						// 살아나는거 확인
@@ -66,11 +69,15 @@ namespace GameSideProgramAutoStarter.Cs
 
 						// 죽은거 확인
 						var CopyPds = pds.Where(item => item.isAlive == false);
-						foreach (ProcessData item in CopyPds)
+						if (CopyPds != null)
 						{
-							log.ProcessLog(item.ProcessName, false);
-							UpdateProcessEvent(item.ProcessName, false);
-							pds.Remove(item);
+							foreach (ProcessData item in CopyPds)
+							{
+								log.ProcessLog(item.ProcessName, false);
+								UpdateProcessEvent(item.ProcessName, false);
+								pds.Remove(item);
+								break;
+							}
 						}
 
 						Thread.Sleep(1);

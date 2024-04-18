@@ -1,7 +1,4 @@
-using GameSideProgramAutoStarter;
 using GameSideProgramAutoStarter.Cs;
-using System;
-using System.Diagnostics;
 using Young.Setting;
 
 namespace GameSideProgramAutoStarter
@@ -20,7 +17,6 @@ namespace GameSideProgramAutoStarter
 		private frmMessageBox? programExitFMB;
 		private frmAlarm alarm = frmAlarm.GetInstance();
 		private SettingForm? sf;
-		private csProcessLog pl = csProcessLog.GetInstance();
 
 		private formMain()
 		{
@@ -33,7 +29,7 @@ namespace GameSideProgramAutoStarter
 			itemSetting.Click += (s, e) =>
 			{
 				if (sf != null) return;
-				
+
 				sf = new SettingForm();
 				sf._SetObject(csProgramLinkMaster.GetInstance(), "링크");
 				sf.ShowDialog();
@@ -59,16 +55,13 @@ namespace GameSideProgramAutoStarter
 			strip.Items.Add(itemExit);
 
 			notifyIcon1.ContextMenuStrip = strip;
-		}
 
-		private Thread? threadProcessCheck = null;
+			// 프로세스 감시 시작
+			csProgramLinkMaster.GetInstance();
+		}
 
 		private void formMain_Load(object sender, EventArgs e)
 		{
-			threadProcessCheck = new Thread(checkProcess);
-			threadProcessCheck.IsBackground = true;
-			threadProcessCheck.Start();
-
 			Thread thread = new Thread(HideForm1);
 			thread.IsBackground = true;
 			thread.Start();
@@ -99,25 +92,6 @@ namespace GameSideProgramAutoStarter
 			{
 				this.Visible = false;
 			});
-		}
-
-		private csProgramLinkMaster master = csProgramLinkMaster.GetInstance();
-
-		private void checkProcess()
-		{
-			while (true)
-			{
-				try
-				{
-					Process[] array = Process.GetProcesses();
-					foreach (Process process in array)
-					{
-					}
-
-					Thread.Sleep(1000);
-				}
-				catch { }
-			}
 		}
 	}
 }
