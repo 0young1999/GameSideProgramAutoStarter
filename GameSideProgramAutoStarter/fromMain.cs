@@ -36,6 +36,7 @@ namespace GameSideProgramAutoStarter
 
 				pl.setAction = false;
 				sf = new SettingForm();
+				sf._SetObject(core, "프로그램 설정");
 				sf._SetObject(csProgramLinkMaster.GetInstance(), "링크");
 				sf.ShowDialog();
 				pl.setAction = true;
@@ -84,8 +85,11 @@ namespace GameSideProgramAutoStarter
 						"보조 프로그램을 자동으로 실행해줘요.\r\n오른쪽 아래에서 종료 및 수정을 할수 있서요!");
 					fmb.ShowDialog();
 
-					core.isFirstRun = false;
-					core.Save();
+					if (core.firstRunAutoOff)
+					{
+						core.isFirstRun = false;
+						core.Save();
+					}
 				}
 
 				alarm.ShowMSG("실행중!");

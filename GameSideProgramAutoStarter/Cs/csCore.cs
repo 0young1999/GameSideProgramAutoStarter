@@ -16,9 +16,12 @@ namespace GameSideProgramAutoStarter.Cs
 			Load();
 		}
 
-		[DisplayName("최초 실행 여부")]
+		[DisplayName("튜토리얼 보기")]
 		[DefaultValue(true)]
-		[SettingType(SettingTypeAttributeEnum.NotShow)]
 		public bool isFirstRun { get; set; }
+
+		[DisplayName("튜토리얼 자동 다신 안보기")]
+		[DefaultValue(true)]
+		public bool firstRunAutoOff { get; set; }
 	}
 }
