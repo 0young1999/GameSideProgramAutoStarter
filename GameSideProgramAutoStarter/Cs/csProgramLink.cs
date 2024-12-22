@@ -6,15 +6,15 @@ using Young.Setting;
 namespace GameSideProgramAutoStarter.Cs
 {
 	[Serializable]
-	public class csProgramLinkMaster : csAutoSaveLoad
+	public class csProgramLink : csAutoSaveLoad
 	{
-		private static csProgramLinkMaster instance;
-		public static csProgramLinkMaster GetInstance()
+		private static csProgramLink instance;
+		public static csProgramLink GetInstance()
 		{
-			if (instance == null) instance = new csProgramLinkMaster();
+			if (instance == null) instance = new csProgramLink();
 			return instance;
 		}
-		private csProgramLinkMaster()
+		private csProgramLink()
 		{
 			Load();
 
@@ -23,9 +23,9 @@ namespace GameSideProgramAutoStarter.Cs
 		}
 
 		private frmAlarm alarm = frmAlarm.GetInstance();
-		private csProcessLog pl = csProcessLog.GetInstance();
+		private csProcessMonitor pl = csProcessMonitor.GetInstance();
 
-		private void pl_Event(object? sender, csProcessLog.ProcessEventArgs e)
+		private void pl_Event(object? sender, csProcessMonitor.ProcessEventArgs e)
 		{
 			if (string.IsNullOrEmpty(e.ProcessName)) return;
 
@@ -35,7 +35,10 @@ namespace GameSideProgramAutoStarter.Cs
 				{
 					if (string.IsNullOrEmpty(item.SideProgramPath)) return;
 
-					item.SideProcessName = Process.Start(item.SideProgramPath).ProcessName;
+					//item.SideProcessName = Process.Start(item.SideProgramPath).ProcessName;
+					ProcessStartInfo info = new ProcessStartInfo(item.SideProgramPath);
+					info.WorkingDirectory = Path.GetDirectoryName(item.SideProgramPath);
+					item.SideProcessName = Process.Start(info).ProcessName;
 
 					alarm.ShowMSG(e.ProcessName + "감지\r\n" + item.SideProcessName + "이(가)\r\n자동으로 실행됩니다.");
 				}
@@ -58,6 +61,7 @@ namespace GameSideProgramAutoStarter.Cs
 		[Description("자행실행 조건을 설정합니다.")]
 		public BindingList<csProgramLinkSub> list { get; set; } = new BindingList<csProgramLinkSub>();
 	}
+
 	[Serializable]
 	public class csProgramLinkSub : csAutoSaveLoad
 	{

@@ -37,7 +37,7 @@
 			// 
 			notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
 			notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
-			notifyIcon1.Text = "AUTOSTARTER";
+			notifyIcon1.Text = "AUTO STARTER";
 			notifyIcon1.Visible = true;
 			// 
 			// formMain

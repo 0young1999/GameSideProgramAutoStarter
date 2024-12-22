@@ -2,15 +2,15 @@
 
 namespace GameSideProgramAutoStarter.Cs
 {
-	public class csProcessLog
+	public class csProcessMonitor
 	{
-		private static csProcessLog instance;
-		public static csProcessLog GetInstance()
+		private static csProcessMonitor instance;
+		public static csProcessMonitor GetInstance()
 		{
-			if (instance == null) instance = new csProcessLog();
+			if (instance == null) instance = new csProcessMonitor();
 			return instance;
 		}
-		private csProcessLog()
+		private csProcessMonitor()
 		{
 			WDT = new Thread(WDTMethod);
 			WDT.IsBackground = true;
