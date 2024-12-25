@@ -23,5 +23,25 @@ namespace GameSideProgramAutoStarter.Cs
 		[DisplayName("튜토리얼 자동 다신 안보기")]
 		[DefaultValue(true)]
 		public bool firstRunAutoOff { get; set; }
+
+		[DisplayName("시스템 모니터 주기(ms)")]
+		[DefaultValue(5000)]
+		public int SystemMonitorCycleTime { get; set; }
+
+		[DisplayName("CPU 사용량 경고 %")]
+		[DefaultValue(50)]
+		public float CPUAlarmPersent { get; set; }
+
+		[DisplayName("Ram 사용량 경고 GB")]
+		[DefaultValue(10)]
+		public float RAMAlarmPersent { get; set; }
+
+		[DisplayName("Disk 읽기 사용량 경고 MB")]
+		[DefaultValue(10)]
+		public float DiskReadAlarmPersent { get; set; }
+
+		[DisplayName("Disk 쓰기 사용량 경고 MB")]
+		[DefaultValue(10)]
+		public float DiskWriteAlarmPersent { get; set; }
 	}
 }

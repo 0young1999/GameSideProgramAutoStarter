@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using Young.Setting;
 
@@ -11,8 +10,7 @@ namespace GameSideProgramAutoStarter.Cs
 		private static csProgramLink instance;
 		public static csProgramLink GetInstance()
 		{
-			if (instance == null) instance = new csProgramLink();
-			return instance;
+			return instance ??= new csProgramLink();
 		}
 		private csProgramLink()
 		{

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using System.Xml.Linq;
 
 namespace GameSideProgramAutoStarter.Cs
 {
@@ -74,6 +75,28 @@ namespace GameSideProgramAutoStarter.Cs
 
 				sb.Append("[").Append(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:fff")).Append("]");
 				sb.Append(isAlive ? "1" : "0").Append(" : ").AppendLine(name);
+
+				File.AppendAllText(fileName, sb.ToString());
+			}
+		}
+
+		public void ProcessUseLog(string msg)
+		{
+			lock (this)
+			{
+				if (Directory.Exists("log") == false)
+				{
+					Directory.CreateDirectory("log");
+				}
+				if (Directory.Exists("log\\ProcessUseLog") == false)
+				{
+					Directory.CreateDirectory("log\\ProcessUseLog");
+				}
+
+				string fileName = "log\\ProcessUseLog\\" + ProcessStartTime + ".txt";
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("[").Append(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:fff")).Append("]").AppendLine(msg);
 
 				File.AppendAllText(fileName, sb.ToString());
 			}
