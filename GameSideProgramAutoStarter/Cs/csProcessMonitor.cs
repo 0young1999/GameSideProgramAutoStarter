@@ -19,9 +19,11 @@ namespace GameSideProgramAutoStarter.Cs
 
 		private csLog log = csLog.GetInstance();
 		private frmAlarm alarm = frmAlarm.GetInstance();
+		private csProgramLink link;
 
 		public class ProcessData
 		{
+			public int id = -1;
 			public string ProcessName = "";
 			public bool isAlive = false;
 			public DateTime lastCheckSystemUse = DateTime.MinValue;
@@ -42,7 +44,7 @@ namespace GameSideProgramAutoStarter.Cs
 
 			csCore core = csCore.GetInstance();
 
-			DateTime lastSystemMonitorTime = DateTime.Now;
+			link = csProgramLink.GetInstance();
 
 			while (true)
 			{
@@ -50,14 +52,12 @@ namespace GameSideProgramAutoStarter.Cs
 				{
 					while (setAction)
 					{
-						do
-						{
-							Thread.Sleep(1);
-							Application.DoEvents();
-						}
-						while (lastSystemMonitorTime >= DateTime.Now);
-
 						foreach (ProcessData data in pds)
+						{
+							data.isAlive = false;
+						}
+
+						foreach (csProgramLinkSub data in link.list)
 						{
 							data.isAlive = false;
 						}
@@ -68,10 +68,19 @@ namespace GameSideProgramAutoStarter.Cs
 						{
 							if (p.Id == 0) continue;
 
-							int findIndex = pds.FindIndex(item => item.ProcessName.Equals(p.ProcessName));
+							int findIndex = pds.FindIndex(item => item.id.Equals(p.Id));
 
 							if (findIndex != -1)
 							{
+								do
+								{
+									Thread.Sleep(1);
+									Application.DoEvents();
+								}
+								while (pds[findIndex].lastCheckSystemUse > DateTime.Now + new TimeSpan(0, 0, 0, 0, core.SystemMonitorCycleTime));
+
+								pds[findIndex].lastCheckSystemUse = DateTime.Now;
+
 								pds[findIndex].isAlive = true;
 
 								if (pds[findIndex].CpuCounter != null)
@@ -82,12 +91,15 @@ namespace GameSideProgramAutoStarter.Cs
 										cpuUse /= Environment.ProcessorCount;
 										if (cpuUse >= core.CPUAlarmPersent)
 										{
-											string msg = string.Format("CPU 경고\n{0}\n{1:N1}%", p.ProcessName, cpuUse);
+											string msg = string.Format("CPU 경고\n{0}[{2}]\n{1:N1}%", p.ProcessName, cpuUse, p.Id);
 											alarm.ShowMSG(msg);
 											log.ProcessUseLog(msg);
 										}
 									}
-									catch { }
+									catch
+									{
+										continue;
+									}
 								}
 
 								if (pds[findIndex].RamCounter != null)
@@ -99,12 +111,15 @@ namespace GameSideProgramAutoStarter.Cs
 										RamUse /= (1024 * 1024 * 1024);
 										if (RamUse >= core.RAMAlarmPersent)
 										{
-											string msg = (string.Format("RAM 경고\n{0}\n{1:N1}GB", p.ProcessName, RamUse));
+											string msg = (string.Format("RAM 경고\n{0}[{2}]\n{1:N1}GB", p.ProcessName, RamUse, p.Id));
 											alarm.ShowMSG(msg);
 											log.ProcessUseLog(msg);
 										}
 									}
-									catch { }
+									catch
+									{
+										continue;
+									}
 								}
 
 								if (pds[findIndex].DiskReadCounter != null)
@@ -116,12 +131,15 @@ namespace GameSideProgramAutoStarter.Cs
 										Use /= (1024 * 1024);
 										if (Use >= core.DiskReadAlarmPersent)
 										{
-											string msg = (string.Format("디스크 읽기 경고\n{0}\n{1:N1}MB", p.ProcessName, Use));
+											string msg = (string.Format("디스크 읽기 경고\n{0}[{2}]\n{1:N1}MB", p.ProcessName, Use, p.Id));
 											alarm.ShowMSG(msg);
 											log.ProcessUseLog(msg);
 										}
 									}
-									catch { }
+									catch
+									{
+										continue;
+									}
 								}
 
 								if (pds[findIndex].DiskWriteCounter != null)
@@ -133,12 +151,15 @@ namespace GameSideProgramAutoStarter.Cs
 										Use /= (1024 * 1024);
 										if (Use >= core.DiskWriteAlarmPersent)
 										{
-											string msg = (string.Format("디스크 쓰기 경고\n{0}\n{1:N1}MB", p.ProcessName, Use));
+											string msg = (string.Format("디스크 쓰기 경고\n{0}[{2}]\n{1:N1}MB", p.ProcessName, Use, p.Id));
 											alarm.ShowMSG(msg);
 											log.ProcessUseLog(msg);
 										}
 									}
-									catch { }
+									catch
+									{
+										continue;
+									}
 								}
 							}
 							else
@@ -198,6 +219,7 @@ namespace GameSideProgramAutoStarter.Cs
 
 								pds.Add(new ProcessData()
 								{
+									id = p.Id,
 									ProcessName = p.ProcessName,
 									isAlive = true,
 									CpuCounter = CPUCounter,
@@ -206,11 +228,12 @@ namespace GameSideProgramAutoStarter.Cs
 									DiskWriteCounter = DiskWriteCounter,
 								});
 								log.ProcessLog(p.ProcessName, true);
-								UpdateProcessEvent(p.ProcessName, true);
 							}
 
 							Thread.Sleep(1);
 						}
+
+						Thread.Sleep(10);
 
 						// 죽은거 확인
 						var CopyPds = pds.Where(item => item.isAlive == false);
@@ -218,8 +241,7 @@ namespace GameSideProgramAutoStarter.Cs
 						{
 							foreach (ProcessData item in CopyPds)
 							{
-								log.ProcessLog(item.ProcessName, false);
-								UpdateProcessEvent(item.ProcessName, false);
+								log.ProcessLog(string.Format("{0}[{1}]", item.ProcessName, item.id), false);
 
 								if (item.CpuCounter != null)
 								{
@@ -245,9 +267,28 @@ namespace GameSideProgramAutoStarter.Cs
 								pds.Remove(item);
 								break;
 							}
+
+							Thread.Sleep(1);
 						}
 
-						lastSystemMonitorTime = DateTime.Now + new TimeSpan(0, 0, 0, 0, core.SystemMonitorCycleTime);
+						Thread.Sleep(10);
+
+						// 사이드 프로그램 자동 시작 컨트롤
+						foreach (csProgramLinkSub data in link.list)
+						{
+							if (data.isAlive && string.IsNullOrEmpty(data.SideProcessName))
+							{
+								UpdateProcessEvent(data.GameProcessName, true);
+							}
+							else if (data.isAlive == false && string.IsNullOrEmpty(data.SideProcessName) == false)
+							{
+								UpdateProcessEvent(data.GameProcessName, false);
+							}
+
+							Thread.Sleep(1);
+						}
+
+						Thread.Sleep(10);
 					}
 					Thread.Sleep(10);
 				}

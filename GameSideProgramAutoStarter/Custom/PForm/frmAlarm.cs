@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic.Devices;
-
-namespace GameSideProgramAutoStarter
+﻿namespace GameSideProgramAutoStarter
 {
 	public partial class frmAlarm : Form
 	{

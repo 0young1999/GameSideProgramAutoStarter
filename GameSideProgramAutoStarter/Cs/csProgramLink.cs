@@ -43,14 +43,19 @@ namespace GameSideProgramAutoStarter.Cs
 			}
 			else
 			{
-				foreach (csProgramLinkSub item in list.Where(item => (item.GameProcessName == e.ProcessName && item.AutoClose)))
+				foreach (csProgramLinkSub item in list.Where(item => (item.GameProcessName == e.ProcessName)))
 				{
-					foreach (Process pSide in Process.GetProcessesByName(item.SideProcessName))
+					if (item.AutoClose)
 					{
-						pSide.Kill();
+						foreach (Process pSide in Process.GetProcessesByName(item.SideProcessName))
+						{
+							pSide.Kill();
+						}
+
+						alarm.ShowMSG(item.GameProcessName + " 종료 감지\r\n" + item.SideProcessName + "이(가)\r\n자동으로 종료됩니다.");
 					}
 
-					alarm.ShowMSG(item.GameProcessName + " 종료 감지\r\n" + item.SideProcessName + "이(가)\r\n자동으로 종료됩니다.");
+					item.SideProcessName = string.Empty;
 				}
 			}
 		}
@@ -71,6 +76,8 @@ namespace GameSideProgramAutoStarter.Cs
 		public string? SideProgramPath { get; set; }
 
 		public string? SideProcessName = null;
+
+		public bool isAlive = false;
 
 		[DisplayName("자동 종료")]
 		[DefaultValue(false)]
