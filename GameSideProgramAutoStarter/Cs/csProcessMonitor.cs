@@ -60,6 +60,7 @@ namespace GameSideProgramAutoStarter.Cs
 					frmAlarm alarm = frmAlarm.GetInstance();
 					csCore core = csCore.GetInstance();
 					csLog log = csLog.GetInstance();
+					csProcessMonitor pm = csProcessMonitor.GetInstance();
 
 					DateTime timeOut;
 
@@ -71,6 +72,8 @@ namespace GameSideProgramAutoStarter.Cs
 						{
 							Thread.Sleep(100);
 						}
+
+						if (pm.setAction == false) continue;
 
 						try
 						{
@@ -208,11 +211,12 @@ namespace GameSideProgramAutoStarter.Cs
 							foreach (ProcessData data in pds)
 							{
 								data.threadSystemCheck = new Thread(data.CheckSystemUse);
+								data.threadSystemCheck.IsBackground = true;
 								data.threadSystemCheck.Start();
 							}
 
 							isFirst = false;
-							alarm.ShowMSG(string.Format("초기 색인 완료\n{0:N1}초 걸림", (DateTime.Now - startTime).TotalSeconds));
+							alarm.ShowMSG(string.Format("초기 색인 완료\n{0:N2}초 걸림", (DateTime.Now - startTime).TotalSeconds));
 						}
 
 						// 죽은거 확인
