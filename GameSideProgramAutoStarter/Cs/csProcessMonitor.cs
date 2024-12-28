@@ -196,6 +196,13 @@ namespace GameSideProgramAutoStarter.Cs
 									isRun = true,
 								};
 
+								if (isFirst == false)
+								{
+									temp.threadSystemCheck = new Thread(temp.CheckSystemUse);
+									temp.threadSystemCheck.IsBackground = true;
+									temp.threadSystemCheck.Start();
+								}
+
 								pds.Add(temp);
 								log.ProcessLog(pss[i].ProcessName, true);
 							}
