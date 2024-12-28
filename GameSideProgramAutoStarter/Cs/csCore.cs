@@ -35,13 +35,5 @@ namespace GameSideProgramAutoStarter.Cs
 		[DisplayName("Ram 사용량 경고 GB")]
 		[DefaultValue(10)]
 		public float RAMAlarmPersent { get; set; }
-
-		[DisplayName("Disk 읽기 사용량 경고 MB")]
-		[DefaultValue(10)]
-		public float DiskReadAlarmPersent { get; set; }
-
-		[DisplayName("Disk 쓰기 사용량 경고 MB")]
-		[DefaultValue(10)]
-		public float DiskWriteAlarmPersent { get; set; }
 	}
 }

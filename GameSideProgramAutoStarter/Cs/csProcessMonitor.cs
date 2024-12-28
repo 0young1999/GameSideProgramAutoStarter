@@ -29,8 +29,8 @@ namespace GameSideProgramAutoStarter.Cs
 			public DateTime lastCheckSystemUse = DateTime.MinValue;
 			public PerformanceCounter? CpuCounter = null;
 			public PerformanceCounter? RamCounter = null;
-			public PerformanceCounter? DiskReadCounter = null;
-			public PerformanceCounter? DiskWriteCounter = null;
+			//public PerformanceCounter? DiskReadCounter = null;
+			//public PerformanceCounter? DiskWriteCounter = null;
 		}
 
 		private Thread WDT;
@@ -131,46 +131,6 @@ namespace GameSideProgramAutoStarter.Cs
 										continue;
 									}
 								}
-
-								if (pds[findIndex].DiskReadCounter != null)
-								{
-
-									try
-									{
-										float Use = pds[findIndex].DiskReadCounter.NextValue();
-										Use /= (1024 * 1024);
-										if (Use >= core.DiskReadAlarmPersent)
-										{
-											string msg = (string.Format("디스크 읽기 경고\n{0}[{2}]\n{1:N1}MB", p.ProcessName, Use, p.Id));
-											alarm.ShowMSG(msg);
-											log.ProcessUseLog(msg);
-										}
-									}
-									catch
-									{
-										continue;
-									}
-								}
-
-								if (pds[findIndex].DiskWriteCounter != null)
-								{
-
-									try
-									{
-										float Use = pds[findIndex].DiskWriteCounter.NextValue();
-										Use /= (1024 * 1024);
-										if (Use >= core.DiskWriteAlarmPersent)
-										{
-											string msg = (string.Format("디스크 쓰기 경고\n{0}[{2}]\n{1:N1}MB", p.ProcessName, Use, p.Id));
-											alarm.ShowMSG(msg);
-											log.ProcessUseLog(msg);
-										}
-									}
-									catch
-									{
-										continue;
-									}
-								}
 							}
 							else
 							{
@@ -234,8 +194,6 @@ namespace GameSideProgramAutoStarter.Cs
 									isAlive = true,
 									CpuCounter = CPUCounter,
 									RamCounter = RAMCounter,
-									DiskReadCounter = DiskReadCounter,
-									DiskWriteCounter = DiskWriteCounter,
 								});
 								log.ProcessLog(p.ProcessName, true);
 							}
@@ -258,16 +216,6 @@ namespace GameSideProgramAutoStarter.Cs
 								{
 									item.RamCounter.Close();
 									item.RamCounter.Dispose();
-								}
-								if (item.DiskReadCounter != null)
-								{
-									item.DiskReadCounter.Close();
-									item.DiskReadCounter.Dispose();
-								}
-								if (item.DiskWriteCounter != null)
-								{
-									item.DiskWriteCounter.Close();
-									item.DiskWriteCounter.Dispose();
 								}
 
 								pds.Remove(item);
