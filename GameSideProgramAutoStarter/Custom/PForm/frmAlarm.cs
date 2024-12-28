@@ -9,7 +9,7 @@
 			return instance;
 		}
 
-		private int ShowTime = 3000;
+		private int ShowTime = 10000;
 
 		private frmAlarm()
 		{
