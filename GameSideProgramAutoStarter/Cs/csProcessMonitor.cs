@@ -44,6 +44,9 @@ namespace GameSideProgramAutoStarter.Cs
 
 			csCore core = csCore.GetInstance();
 
+			bool isFirst = true;
+			DateTime startTime = DateTime.Now;
+
 			link = csProgramLink.GetInstance();
 
 			while (true)
@@ -68,16 +71,23 @@ namespace GameSideProgramAutoStarter.Cs
 						{
 							if (p.Id == 0) continue;
 
+							csProgramLinkSub[] links = link.list.Where(item => item.GameProcessName.Equals(p.ProcessName) && item.isAlive == false).ToArray();
+
+							foreach (csProgramLinkSub item in links)
+							{
+								item.isAlive = true;
+							}
+
 							int findIndex = pds.FindIndex(item => item.id.Equals(p.Id));
 
 							if (findIndex != -1)
 							{
-								do
+								while (pds[findIndex].lastCheckSystemUse + new TimeSpan(0, 0, 0, 0, core.SystemMonitorCycleTime) > DateTime.Now)
 								{
-									Thread.Sleep(1);
+									Thread.Sleep(100);
 									Application.DoEvents();
 								}
-								while (pds[findIndex].lastCheckSystemUse > DateTime.Now + new TimeSpan(0, 0, 0, 0, core.SystemMonitorCycleTime));
+								
 
 								pds[findIndex].lastCheckSystemUse = DateTime.Now;
 
@@ -229,11 +239,7 @@ namespace GameSideProgramAutoStarter.Cs
 								});
 								log.ProcessLog(p.ProcessName, true);
 							}
-
-							Thread.Sleep(1);
 						}
-
-						Thread.Sleep(10);
 
 						// 죽은거 확인
 						var CopyPds = pds.Where(item => item.isAlive == false);
@@ -267,11 +273,7 @@ namespace GameSideProgramAutoStarter.Cs
 								pds.Remove(item);
 								break;
 							}
-
-							Thread.Sleep(1);
 						}
-
-						Thread.Sleep(10);
 
 						// 사이드 프로그램 자동 시작 컨트롤
 						foreach (csProgramLinkSub data in link.list)
@@ -284,8 +286,12 @@ namespace GameSideProgramAutoStarter.Cs
 							{
 								UpdateProcessEvent(data.GameProcessName, false);
 							}
+						}
 
-							Thread.Sleep(1);
+						if (isFirst)
+						{
+							isFirst = false;
+							alarm.ShowMSG(string.Format("초기 색인 완료\n{0:N1}초 걸림", (DateTime.Now - startTime).TotalSeconds));
 						}
 
 						Thread.Sleep(10);
